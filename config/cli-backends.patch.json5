@@ -1,0 +1,12 @@
+// Template only. Do not apply this file directly.
+//
+// CLI backend commands must be absolute paths for the machine running the
+// OpenClaw gateway. Generate the real patch locally with:
+//
+//   scripts/render-cli-backends.sh
+//   openclaw config patch --file config/cli-backends.generated.patch.json5 --dry-run
+//   openclaw config patch --file config/cli-backends.generated.patch.json5
+//
+// The generated file is intentionally ignored by git so a laptop path cannot
+// be committed and later applied on the VPS.
+{}

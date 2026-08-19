@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Fixed entrypoint for safe-crawl.py, so the agent has one script name to
+# remember and the exec allowlist has one exact string to match — not a venv
+# path it has to reconstruct correctly every time.
+#
+#   scripts/safe-crawl <url>
+set -euo pipefail
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+PYTHON_BIN="$DIR/../crawl4ai-venv/bin/python3"
+if [ ! -x "$PYTHON_BIN" ]; then
+  PYTHON_BIN="$(command -v python3 || true)"
+fi
+[ -n "$PYTHON_BIN" ] || { echo "python3 not found" >&2; exit 1; }
+
+exec "$PYTHON_BIN" "$DIR/scripts/safe-crawl.py" "$@"

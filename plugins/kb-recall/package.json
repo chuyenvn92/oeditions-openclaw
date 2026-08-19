@@ -1,0 +1,10 @@
+{
+  "name": "kb-recall",
+  "version": "0.1.0",
+  "description": "Auto-inject relevant notes from the local knowledge base before the model answers — same shape as qmd-recall, but embeds through Cohere's hosted API instead of a local model.",
+  "type": "module",
+  "main": "index.js",
+  "openclaw": {
+    "extensions": ["./index.js"]
+  }
+}

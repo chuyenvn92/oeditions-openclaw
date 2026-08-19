@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Fixed entrypoint for kb-save.py — one script name for the exec
+# allowlist to match.
+#
+#   scripts/kb-save "<note content>" [--topic <topic_name>]
+set -euo pipefail
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+. "$DIR/scripts/env.sh"
+load_standard_env "$DIR"
+
+PYTHON_BIN="$(command -v python3 || true)"
+[ -n "$PYTHON_BIN" ] || { echo "python3 not found" >&2; exit 1; }
+
+exec "$PYTHON_BIN" "$DIR/scripts/kb-save.py" "$@"

@@ -1,0 +1,17 @@
+{
+  agents: {
+    defaults: {
+      // The backend itself lives in cli-backends.generated.patch.json5, which is the
+      // record of every cliBackend. This file records only the swap: what was
+      // removed, and the model alias that made qoder reachable by name.
+      cliBackends: {
+        "perplexity-web": null,
+      },
+      models: {
+        "qoder-cli/auto": {
+          alias: "qoder",
+        },
+      },
+    },
+  },
+}

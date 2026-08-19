@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Fixed entrypoint for github-review.py — one script name for the exec
+# allowlist to match, so allowlisting it doesn't also allowlist python3 itself.
+#
+#   scripts/github-review <owner/repo#PR_number | URL>
+set -euo pipefail
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+. "$DIR/scripts/env.sh"
+load_standard_env "$DIR"
+exec python3 "$DIR/scripts/github-review.py" "$@"

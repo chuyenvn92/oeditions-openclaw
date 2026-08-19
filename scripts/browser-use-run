@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Fixed entrypoint for browser-use-run.py — one script name for the exec
+# allowlist to match, so allowlisting it doesn't also allowlist python3
+# itself (which would let arbitrary Python run).
+#
+#   scripts/browser-use-run "<task in natural language>"
+set -euo pipefail
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+# The gateway process (systemd, not a login shell) doesn't load
+# secrets.env — this script does it itself so BROWSER_USE_API_KEY reaches
+# the Python process regardless of who launched this wrapper.
+. "$DIR/scripts/env.sh"
+load_standard_env "$DIR"
+exec python3 "$DIR/scripts/browser-use-run.py" "$@"

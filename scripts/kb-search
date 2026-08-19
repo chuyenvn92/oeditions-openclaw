@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Fixed entrypoint for kb-search.py — one script name for the exec
+# allowlist to match, COHERE_API_KEY loaded here since the gateway
+# process (systemd) never reads ~/.profile.
+#
+#   scripts/kb-search "<question>"
+set -euo pipefail
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+. "$DIR/scripts/env.sh"
+load_standard_env "$DIR"
+exec python3 "$DIR/scripts/kb-search.py" "$@"

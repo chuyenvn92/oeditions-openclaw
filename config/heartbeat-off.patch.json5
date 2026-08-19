@@ -1,0 +1,21 @@
+{
+  // Chat bots do not need to wake themselves up. The default is one real agent
+  // turn every 30m (1h under Anthropic OAuth/CLI auth) — see
+  // docs/gateway/heartbeat.md in the openclaw package. Five agents on that
+  // default is a few hundred turns a day for nobody, each carrying a full
+  // bootstrap prompt.
+  //
+  // On defaults, not per agent, and that is the point. The `agents.list` form
+  // could not be applied at all: `config patch` merges objects but REPLACES
+  // arrays, so it refuses rather than adding to the list, and points at a
+  // --merge flag this command does not have. One key on defaults needs no
+  // array and covers every agent, now and later.
+  agents: {
+    defaults: {
+      // Keep chat/demo sessions from growing into the full 1M-token Claude
+      // window. Raise this for explicit long-document/coding sessions.
+      contextTokens: 120000,
+      heartbeat: { every: "0m" },
+    },
+  },
+}

@@ -1,0 +1,52 @@
+{
+  "id": "kb-recall",
+  "name": "KB Recall",
+  "version": "0.1.0",
+  "main": "index.js",
+  "entry": "index.js",
+  "description": "Before-prompt recall over a local Cohere-embedded notes index. No local model, no shell exec — reads the index file and calls Cohere's hosted embed API directly.",
+  "hooks": ["before_prompt_build"],
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "agents": {
+        "type": "array",
+        "items": { "type": "string" }
+      },
+      "allowedChatTypes": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": ["direct", "group", "channel", "unknown"]
+        }
+      },
+      "indexPath": {
+        "type": "string"
+      },
+      "maxResults": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "minScore": {
+        "type": "number"
+      },
+      "maxSnippetChars": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "triggers": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "minChars": { "type": "integer", "minimum": 1 },
+          "include": { "type": "array", "items": { "type": "string" } },
+          "exclude": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  },
+  "security-notes": "Reads secrets.env directly for COHERE_API_KEY (the gateway process has no provider env vars available to plugins). Calls api.cohere.com over HTTPS with a hard timeout. No shell execution, no filesystem writes.",
+  "privacy-notes": "Injects note snippets into hidden prompt context only, scoped to the agents listed in config.agents.",
+  "activation": { "onStartup": true }
+}

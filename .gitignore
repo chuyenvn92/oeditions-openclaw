@@ -1,0 +1,18 @@
+.DS_Store
+node_modules/
+.env
+.env.*
+
+# Bot tokens, if one is ever left behind
+*.token
+
+# Python & Temporary files
+__pycache__/
+*.py[cod]
+*.tmp
+verification-report.json
+config/cli-backends.generated.patch.json5
+
+# Local-only working notes
+docs/vps-config-notes.md
+personas/ROSTER.local.md

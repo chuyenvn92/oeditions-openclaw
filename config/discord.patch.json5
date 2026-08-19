@@ -1,0 +1,20 @@
+{
+  channels: {
+    // "mentions" is the safe half of allowBots: a bot only accepts another
+    // bot's message when that message mentions it. Cross-review works; idle
+    // chatter between bots never starts.
+    discord: {
+      allowBots: "mentions",
+    },
+    // Written out explicitly rather than left implicit, because these are the
+    // numbers that stop a two-bot ping-pong from burning the whole quota.
+    defaults: {
+      botLoopProtection: {
+        enabled: true,
+        maxEventsPerWindow: 20,
+        windowSeconds: 60,
+        cooldownSeconds: 60,
+      },
+    },
+  },
+}
