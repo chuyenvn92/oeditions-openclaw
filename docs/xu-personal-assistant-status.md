@@ -7,11 +7,12 @@ live against the VPS — not just what's configured.
 
 Security/reliability foundation, verified end to end:
 
-- Exec is deny-by-default. Allowlist has 4 wrapper scripts (checked live via
-  `openclaw approvals get`): `safe-crawl`, `browser-use-run`, `kb-search`,
-  `github-review`. `github-review` also has explicit flag patterns for
-  `--review-requests` and `--review-requests *`; no bare
-  `curl`/`python3`/anything else gets through.
+- Exec is deny-by-default for Xu. Allowlist has wrapper scripts (checked live
+  via `openclaw approvals get`): `safe-crawl`, `browser-use-run`, `kb-search`,
+  `github-review`, `web-search`, `kb-save`, and `ask-agent`.
+  `github-review` also has explicit flag patterns for `--review-requests` and
+  `--review-requests *`. No bare `curl`/`python3`/anything else gets through.
+  `ask-agent` is additionally hard-gated in the script to `codex` only.
 - Every tool that ingests third-party content wraps its output in
   `=== UNTRUSTED ... ===` delimiters, and `personas/deepseek/SOUL.md` has an
   explicit rule: text from the internet (or a PR, or a browser session) is
@@ -36,6 +37,7 @@ Security/reliability foundation, verified end to end:
   screenshots — via a cloud browser (`browser-use-run`), capped at $2/call.
 - Search the user's own notes/decisions automatically when a message looks like
   it needs them (`kb-recall` hook + `kb-search`).
+- Save durable notes/decisions to the private KB (`kb-save`), then re-index.
 - Pull a GitHub PR's title, description, changed files, and diff for a quick
   read (`github-review`), read-only.
 - List open GitHub PRs requesting Chuyên's review
@@ -48,6 +50,16 @@ Security/reliability foundation, verified end to end:
 - Answer when tagged in Discord, short by default, longer/multi-angle mode
   when someone bounces a raw unformed idea at it.
 
+## Permission caveat: OpenClaw tools vs CLI backends
+
+`openclaw approvals get` controls the OpenClaw `exec` tool. API agents like Xu
+and Chùa respect it directly. CLI-backed agents (`codex-cli` for Vé Tháng and
+`qoder-cli` for Thợ) can still run commands inside their own CLI backend when
+they are invoked; this does not pass through OpenClaw's `exec` allowlist. As of
+2026-08-20 this is intentional for tagged specialist work, but it means the
+true boundary for Vé Tháng/Thợ is "only invoked when tagged/consulted", not a
+wrapper-level exec allowlist.
+
 ## What Xu can't do yet (gaps, in rough priority order)
 
 1. **No email.** Explicitly deferred (Viec 5 / AgentMail) because the user
@@ -55,18 +67,22 @@ Security/reliability foundation, verified end to end:
    Antigravity was asked to do (`openclaw --version` / plugin compat, no
    implementation) — needs re-confirming, wasn't checked after the last
    round of work.
-2. **No real memory beyond the 2 fixed cron slots.** Xu doesn't decide *what*
+2. **No ad-hoc reminder delivery yet.** The old `schedule-reminder` wrapper only
+   wrote `~/data/reminders.json`; no verified worker delivered those reminders.
+   It is deliberately not advertised in Xu's persona until a delivery loop is
+   installed and tested.
+3. **No real memory beyond the 2 fixed cron slots.** Xu doesn't decide *what*
    to check or *when* — it only runs the two jobs on their fixed schedule.
    There's no "remember I asked about X, follow up later" capability.
-3. **Can't take an ad-hoc "go check this for me" request** outside the 4
+4. **Can't take an ad-hoc "go check this for me" request** outside the
    allowlisted scripts. Anything not already wired as a script is a hard
    deny, by design — safe, but it means every new capability is still a
    manual build-and-review cycle, not something Xu can improvise.
-4. **No cross-session continuity for anything except the memory-core files.**
+5. **No cross-session continuity for anything except the memory-core files.**
    Isolated cron sessions mean Xu can't say "like I mentioned yesterday" about
    anything that wasn't explicitly written to `MEMORY.md` by hand or by a
    previous run.
-5. **No real-usage track record yet.** Everything above is verified
+6. **No real-usage track record yet.** Everything above is verified
    *mechanically* (config is correct, scripts run, cron delivers) — there's
    no data yet on whether the daily digests are actually useful after a
    week of real mornings, or just noise that gets ignored. Worth checking

@@ -35,6 +35,7 @@ AGENT_ALIASES = {
 }
 
 TIMEOUT_SECONDS = 90
+ALLOWED_AGENT_IDS = {"codex"}
 
 
 def resolve_agent(name: str) -> str:
@@ -75,6 +76,14 @@ def main() -> int:
         return 2
 
     agent_id = resolve_agent(raw_agent)
+    if agent_id not in ALLOWED_AGENT_IDS:
+        print(
+            "Error: ask-agent is only allowlisted for codex / Vé Tháng. "
+            "Ask the human to tag Chùa or Thợ directly.",
+            file=sys.stderr,
+        )
+        return 2
+
     openclaw_cmd = find_node_and_openclaw()
 
     cmd = openclaw_cmd + [
