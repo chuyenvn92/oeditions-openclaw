@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Fixed entrypoint for token-report.py.
+#
+#   scripts/token-report [--days 1] [--agent deepseek] [--all]
+set -euo pipefail
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+. "$DIR/scripts/env.sh"
+load_standard_env "$DIR"
+exec python3 "$DIR/scripts/token-report.py" "$@"

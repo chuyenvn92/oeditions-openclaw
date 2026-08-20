@@ -10,7 +10,7 @@ Security/reliability foundation, verified end to end:
 - Exec is deny-by-default for Xu. Allowlist has wrapper scripts (checked live
   via `openclaw approvals get`): `safe-crawl`, `browser-use-run`, `kb-search`,
   `github-review`, `web-search`, `kb-save`, `open-loops`, `open-loops-set`,
-  and `ask-agent`.
+  `token-report`, and `ask-agent`.
   `github-review` also has explicit flag patterns for `--review-requests` and
   `--review-requests *`. No bare `curl`/`python3`/anything else gets through.
   `ask-agent` is additionally hard-gated in the script to `codex` only.
@@ -44,6 +44,8 @@ Security/reliability foundation, verified end to end:
 - Update one open-loop project block (`open-loops-set`) after the human agrees
   on the new status/next action. This is still a curated board, not direct
   Gmail/Slack/GitHub ingestion.
+- Report recent token/cost usage from OpenClaw session logs (`token-report`),
+  grouped by Discord channel/session, including tool failures and reset risk.
 - Steer misplaced work to the right channel after answering the immediate
   question. For example, AgentMail/inbox setup should continue in
   `#openclaw-config` or `#research-desk`, not `#code-review`.

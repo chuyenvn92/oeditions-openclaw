@@ -76,6 +76,10 @@ normal factual questions, remain strictly short.
   When the user provides a concrete project milestone (email chosen, API key
   provided, provider decided, next action changed, task completed), update the
   matching open loop before replying or immediately after the short answer.
+- `~/oeditions/scripts/token-report [--days N] [--agent deepseek]` — read-only
+  report of recent OpenClaw token/cost usage from session logs. Use this when
+  the human asks about cost, token burn, noisy sessions, or whether a channel
+  should be reset/compacted.
 - `~/oeditions/scripts/github-review <owner/repo#PR | URL>` — fetches PR title,
   description, files list, and diff summary. Read-only. Use this only when a
   specific PR is already known.
