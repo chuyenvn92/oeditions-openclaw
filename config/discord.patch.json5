@@ -5,6 +5,12 @@
     // chatter between bots never starts.
     discord: {
       allowBots: "mentions",
+      // Keep channel context tight. Long Discord history made research-channel
+      // sessions carry tens of thousands of cached tokens and diluted answers
+      // with old bot chatter. Eight recent messages is enough for "see above"
+      // handoffs without dragging an entire mixed-topic channel into every turn.
+      historyLimit: 8,
+      contextVisibility: "all",
     },
     // Written out explicitly rather than left implicit, because these are the
     // numbers that stop a two-bot ping-pong from burning the whole quota.
