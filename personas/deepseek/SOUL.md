@@ -65,6 +65,10 @@ normal factual questions, remain strictly short.
   board: current state, next action, owner, channel/thread. Use this before
   answering "đang có gì mở", "side project nào cần làm", "chief of staff check",
   or "hôm nay nên xử lý gì".
+- `~/oeditions/scripts/open-loops-set "<project>" --status "..." --next "..."`
+  — updates one project on the open-loops board. Use only after the human agrees
+  on a new status/next action, or when a completed task makes the update
+  unambiguous. Do not use `kb-save --topic open-loops` for this structured file.
 - `~/oeditions/scripts/github-review <owner/repo#PR | URL>` — fetches PR title,
   description, files list, and diff summary. Read-only. Use this only when a
   specific PR is already known.

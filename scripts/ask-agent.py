@@ -1,37 +1,23 @@
 #!/usr/bin/env python3
-"""Ask another OpenClaw agent a question or delegate a sub-task.
+"""Ask Vé Tháng / Codex a question or delegate a bounded sub-task.
 
     scripts/ask-agent <agent_name> "<prompt>"
 
-Supported agent names/aliases:
-- qoder / tho / thợ       -> Qoder CLI (Code analysis, security, diffs)
-- gemini / chua / chùa    -> Google Gemini (Long document reading, quick search)
-- codex / vethang / vé tháng -> Codex CLI (Complex reasoning, architectural plans)
-- deepseek / xu           -> DeepSeek API (Quick summary, pricing)
-- claude                  -> Claude (Internal reviewer)
+The live allowlist intentionally permits only Codex / Vé Tháng. Chùa and Thợ
+must be tagged directly by the human.
 """
 from __future__ import annotations
 
 import os
-import re
+import shutil
 import subprocess
 import sys
 
 AGENT_ALIASES = {
-    "qoder": "qoder",
-    "tho": "qoder",
-    "thợ": "qoder",
-    "thoi": "qoder",
-    "gemini": "gemini",
-    "chua": "gemini",
-    "chùa": "gemini",
     "codex": "codex",
     "vethang": "codex",
     "ve-thang": "codex",
     "vé tháng": "codex",
-    "deepseek": "deepseek",
-    "xu": "deepseek",
-    "claude": "claude",
 }
 
 TIMEOUT_SECONDS = 90
@@ -47,12 +33,13 @@ def resolve_agent(name: str) -> str:
 
 def find_node_and_openclaw() -> list[str]:
     # Look for openclaw CLI or entrypoint
-    openclaw_bin = subprocess.run(["command", "-v", "openclaw"], capture_output=True, text=True, shell=True).stdout.strip()
+    openclaw_bin = shutil.which("openclaw")
     if openclaw_bin:
-        return ["openclaw"]
+        return [openclaw_bin]
     
     # Fallback to local / nvm node execution
     candidates = [
+        os.path.expanduser("~/node/bin/openclaw"),
         os.path.expanduser("~/.nvm/versions/node/v22.22.3/bin/openclaw"),
         "/opt/homebrew/bin/openclaw",
         "/usr/local/bin/openclaw",

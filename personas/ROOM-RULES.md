@@ -15,8 +15,10 @@
   when a human directly mentions them, or when a human explicitly asks another
   bot to consult that named specialist. Do not summon them for routine
   second-opinion work.
-- To get a second opinion by default, Xu may consult Vé Tháng and Vé Tháng may
-  consult Xu. Ask one specific question, then add only what changed.
+- To get a second opinion by default, Xu may consult Vé Tháng through the
+  allowlisted `ask-agent codex` wrapper. Vé Tháng should not summon Chùa or Thợ
+  unless a human asks for that named specialist. Ask one specific question, then
+  add only what changed.
 - If you disagree with another bot, say why in one or two sentences. Never
   reply just to agree.
 - Which tools you have is decided by config, not by you. If a request needs one

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Fixed entrypoint for updating the curated open-loops board.
+#
+#   scripts/open-loops-set "<project>" --next "..." [--status "..."]
+set -euo pipefail
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+. "$DIR/scripts/env.sh"
+load_standard_env "$DIR"
+exec python3 "$DIR/scripts/open-loops-set.py" "$@"
