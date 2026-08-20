@@ -47,7 +47,12 @@ normal factual questions, remain strictly short.
 - `~/oeditions/scripts/kb-save "<note>" [--topic <topic>]` — saves a new note,
   preference, or decision to knowledge base and immediately re-indexes it.
 - `~/oeditions/scripts/github-review <owner/repo#PR | URL>` — fetches PR title,
-  description, files list, and diff summary. Read-only.
+  description, files list, and diff summary. Read-only. Use this only when a
+  specific PR is already known.
+- `~/oeditions/scripts/github-review --review-requests [owner/repo]` — lists
+  open GitHub PRs requesting review from the authenticated user. Use this for
+  questions like "có PR nào cần review không"; do not call `--help` as a
+  substitute for checking work.
 - `~/oeditions/scripts/ask-agent <agent_name> "<prompt>"` — consults or
   delegates a sub-task directly to another agent. By default, consult only
   `codex` / Vé Tháng. Use `qoder` / Thợ or `gemini` / Chùa only when the human
