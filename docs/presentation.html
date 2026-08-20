@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenClaw: biến Discord thành phòng làm việc AI riêng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            ink: '#f6f3ea',
+            night: '#080a0c',
+            panel: '#101418',
+            mint: '#5eead4',
+            brass: '#f8c66d',
+            rose: '#fb7185',
+            blue: '#7dd3fc',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body { width: 100%; height: 100%; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.035), transparent 34%),
+        linear-gradient(135deg, #080a0c 0%, #101418 46%, #0b1014 100%);
+      color: #f6f3ea;
+      letter-spacing: 0;
+    }
+    .slide-enter { animation: slideIn 0.18s ease-out forwards; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .glass {
+      background: rgba(16, 20, 24, 0.82);
+      border: 1px solid rgba(246, 243, 234, 0.11);
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+    }
+    .thin-card {
+      background: rgba(255, 255, 255, 0.045);
+      border: 1px solid rgba(246, 243, 234, 0.11);
+      border-radius: 8px;
+    }
+    .kbd {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      padding: 1px 6px;
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex flex-col overflow-hidden select-none">
+  <div class="h-1 w-full bg-white/5 relative z-50">
+    <div id="progressBar" class="h-full bg-gradient-to-r from-mint via-brass to-blue transition-all duration-300 w-[8.33%]"></div>
+  </div>
+
+  <header class="h-14 px-6 border-b border-white/[0.08] bg-[#080a0c]/88 backdrop-blur-md flex items-center justify-between flex-shrink-0 z-40">
+    <div class="flex items-center gap-3 min-w-0">
+      <span class="font-extrabold text-sm tracking-wide text-ink truncate">
+        OE EDITIONS S6 <span class="text-mint mono">/ BEYOND CHATBOTS</span>
+      </span>
+      <span id="slideCategory" class="hidden sm:inline-flex text-xs mono uppercase font-bold text-brass bg-brass/10 border border-brass/20 px-2.5 py-0.5 rounded-md">
+        MỞ ĐẦU
+      </span>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <button onclick="toggleNotes()" class="px-2.5 py-1 rounded-md bg-white/5 hover:bg-white/10 border border-white/10 text-xs mono text-slate-300 flex items-center gap-1.5 transition">
+        <span class="w-1.5 h-1.5 rounded-full bg-mint"></span>
+        <span class="hidden sm:inline">Notes</span>
+      </button>
+      <div class="text-xs mono text-slate-400">
+        <span id="currentSlideNum" class="text-white font-bold">01</span> / <span id="totalSlidesNum">12</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <button onclick="prevSlide()" class="p-1.5 rounded-md bg-white/5 hover:bg-white/10 text-slate-300 transition" aria-label="Previous slide">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button onclick="nextSlide()" class="p-1.5 rounded-md bg-white/5 hover:bg-white/10 text-slate-300 transition" aria-label="Next slide">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 flex items-center justify-center px-4 py-6 md:px-10 md:py-8 overflow-hidden relative">
+    <div id="slideContent" class="w-full max-w-6xl h-full flex flex-col justify-center slide-enter"></div>
+  </main>
+
+  <footer class="hidden md:flex h-9 px-6 border-t border-white/[0.06] bg-[#080a0c] items-center justify-between text-[11px] mono text-slate-500 flex-shrink-0">
+    <div class="flex items-center gap-4">
+      <span><span class="kbd">Space</span> / <span class="kbd">-&gt;</span> tiếp</span>
+      <span><span class="kbd">&lt;-</span> lùi</span>
+      <span><span class="kbd">S</span> notes</span>
+      <span><span class="kbd">F</span> fullscreen</span>
+    </div>
+    <div>
+      <span class="text-slate-400">Demo core: <strong class="text-mint">đỡ loạn việc</strong>, không khoe code</span>
+    </div>
+  </footer>
+
+  <div id="speakerNotesDrawer" class="hidden fixed bottom-12 right-6 w-[430px] max-w-[calc(100vw-24px)] max-h-80 glass rounded-lg p-4 z-50 overflow-y-auto text-xs space-y-2">
+    <div class="flex items-center justify-between border-b border-white/10 pb-1.5 mono">
+      <span class="font-bold text-mint">SPEAKER NOTES</span>
+      <button onclick="toggleNotes()" class="text-slate-400 hover:text-white">x</button>
+    </div>
+    <div id="speakerNotesContent" class="text-slate-300 leading-relaxed font-sans text-xs"></div>
+  </div>
+
+  <script>
+    const SLIDES = [
+      {
+        category: "MỞ ĐẦU",
+        title: "Mình không muốn thêm một cái chat AI nữa",
+        insight: "Mình muốn có một chỗ để ném việc vào, rồi nó biết nên hỏi lại gì, gọi ai, và ghi lại kết quả ở đâu.",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-[1.05fr_0.95fr] gap-5">
+            <div class="glass rounded-lg p-6 md:p-7 space-y-5">
+              <div class="mono text-xs text-brass font-bold uppercase">Ban đầu</div>
+              <div class="text-3xl md:text-5xl font-black leading-tight text-white">Nhét nhiều AI vào chung một chat</div>
+              <div class="text-slate-300 text-base md:text-lg">Nghe có vẻ xịn hơn, nhưng test một lúc là loạn: con nào cũng nói, trả lời trùng, cuối cùng mình vẫn phải tự chốt.</div>
+            </div>
+            <div class="glass rounded-lg p-6 md:p-7 space-y-5 border-mint/30">
+              <div class="mono text-xs text-mint font-bold uppercase">Sau khi sửa</div>
+              <div class="text-3xl md:text-5xl font-black leading-tight text-white">Một văn phòng riêng trên Discord</div>
+              <div class="text-slate-300 text-base md:text-lg">Xu nhận việc trước. Việc nào cần đọc dài, nghĩ sâu, hay soi code thì mới gọi đúng con còn lại.</div>
+            </div>
+          </div>
+        `,
+        notes: "Mở bằng trải nghiệm thật: mình cũng từng nghĩ thêm bot là mạnh hơn. Nhưng càng test càng thấy vấn đề không phải thiếu model, mà là thiếu cách giao việc."
+      },
+      {
+        category: "VẤN ĐỀ",
+        title: "Vì sao càng dùng càng thấy nó ngáo?",
+        insight: "Nhiều khi không phải AI ngu hơn. Là mình đang bắt nó nhớ một đống chuyện không liên quan.",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-rose font-bold">Một phòng làm tất cả</div>
+              <div class="text-slate-300">Hỏi review code, rồi nhảy sang video, rồi hỏi server, rồi quay lại bài nói.</div>
+            </div>
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-brass font-bold">Mỗi câu đều bị kéo nợ cũ</div>
+              <div class="text-slate-300">Nó phải đọc lại quá nhiều đoạn chat cũ trước khi trả lời câu hiện tại.</div>
+            </div>
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-blue font-bold">Không ai đứng ra chốt</div>
+              <div class="text-slate-300">Nhiều bot cùng góp ý nghe có vẻ kỹ, nhưng xong vẫn không biết nghe ai.</div>
+            </div>
+          </div>
+          <div class="mt-5 p-4 rounded-lg bg-rose/10 border border-rose/25 text-slate-200 text-center font-semibold">
+            Lúc đó vấn đề không phải là thiếu bot. Vấn đề là thiếu cách giao việc.
+          </div>
+        `,
+        notes: "Giữ chữ 'ngáo' vì đó là cảm giác rất thật khi dùng AI lâu: hôm qua trả lời hay, hôm nay tự nhiên lạc đề. Giải thích bằng chuyện context bị trộn, không cần nói thuật ngữ."
+      },
+      {
+        category: "SƠ ĐỒ MỚI",
+        title: "Nên mình chia vai lại",
+        insight: "Không để 4 con tranh nhau nói. Một con nhận việc trước, mấy con kia chỉ gọi khi cần.",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+            <div class="thin-card p-5 border-mint/30 bg-mint/5">
+              <div class="text-3xl mb-3">🪙</div>
+              <div class="mono text-mint font-bold">Xu</div>
+              <div class="text-slate-300 mt-2">Nhận việc, hỏi lại, tìm nhanh, nhắc việc còn dang dở.</div>
+            </div>
+            <div class="thin-card p-5 border-blue/30 bg-blue/5">
+              <div class="text-3xl mb-3">🎫</div>
+              <div class="mono text-blue font-bold">Vé Tháng</div>
+              <div class="text-slate-300 mt-2">Việc cần nghĩ lâu, chốt hướng, cân tradeoff.</div>
+            </div>
+            <div class="thin-card p-5">
+              <div class="text-3xl mb-3">🆓</div>
+              <div class="mono text-slate-200 font-bold">Chùa</div>
+              <div class="text-slate-400 mt-2">Đọc dài, tóm tắt dài, khi cần tiết kiệm chi phí.</div>
+            </div>
+            <div class="thin-card p-5">
+              <div class="text-3xl mb-3">🔧</div>
+              <div class="mono text-slate-200 font-bold">Thợ</div>
+              <div class="text-slate-400 mt-2">Soi code, soi diff, bắt rủi ro kỹ thuật.</div>
+            </div>
+          </div>
+        `,
+        notes: "Nói đơn giản: giống một nhóm nhỏ, không phải cuộc họp mà ai cũng phải phát biểu. Con nào không cần thì im."
+      },
+      {
+        category: "CÔNG CỤ",
+        title: "Mình dùng những gì?",
+        insight: "Không cần biết code. Chỉ cần hiểu mỗi món đang đóng vai gì.",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs md:text-sm">
+            <div class="thin-card p-4">
+              <div class="mono text-brass font-bold">Discord</div>
+              <div class="text-slate-300 mt-2">Chỗ mình nói chuyện và giao việc.</div>
+            </div>
+            <div class="thin-card p-4">
+              <div class="mono text-mint font-bold">OpenClaw</div>
+              <div class="text-slate-300 mt-2">Người gác cửa: ai được trả lời, gọi bot nào.</div>
+            </div>
+            <div class="thin-card p-4">
+              <div class="mono text-blue font-bold">VPS</div>
+              <div class="text-slate-300 mt-2">Cái máy luôn bật, để bot không phụ thuộc laptop.</div>
+            </div>
+            <div class="thin-card p-4">
+              <div class="mono text-white font-bold">4 bot</div>
+              <div class="text-slate-300 mt-2">Mỗi con một việc: rẻ, dài, code, hoặc nghĩ sâu.</div>
+            </div>
+            <div class="thin-card p-4">
+              <div class="mono text-brass font-bold">Memory</div>
+              <div class="text-slate-300 mt-2">Nơi ghi lại quyết định và việc còn dang dở.</div>
+            </div>
+          </div>
+        `,
+        notes: "Slide này để người non-tech có bản đồ trong đầu. Không sa vào API/CLI/model name nếu không cần. Có thể nói: Discord là văn phòng, OpenClaw là gác cửa, VPS là máy luôn bật."
+      },
+      {
+        category: "CHỖ ĐỂ VIỆC",
+        title: "Mỗi việc nên có đúng chỗ của nó",
+        insight: "Chia channel không phải cho đẹp. Nó giúp mình không kéo chuyện cũ sang chuyện mới.",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-[0.9fr_1.1fr] gap-5">
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-brass font-bold">Luật rất đơn giản</div>
+              <div class="space-y-2 text-slate-300">
+                <div>1. Dự án riêng thì để kênh riêng.</div>
+                <div>2. Việc nhỏ thì mở thread.</div>
+                <div>3. Nói dài quá thì tóm tắt lại.</div>
+                <div>4. Chốt xong thì bảo Xu ghi lại.</div>
+              </div>
+            </div>
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-mint font-bold">Channel hiện tại</div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-slate-300">
+                <div class="p-3 bg-black/20 rounded-md">#research-desk<br><span class="text-slate-500">tìm nguồn, kiểm chứng</span></div>
+                <div class="p-3 bg-black/20 rounded-md">#openclaw-config<br><span class="text-slate-500">server, bot, quyền</span></div>
+                <div class="p-3 bg-black/20 rounded-md">#code-review<br><span class="text-slate-500">code, PR, lỗi kỹ thuật</span></div>
+                <div class="p-3 bg-black/20 rounded-md">#demo-stage<br><span class="text-slate-500">luồng demo sạch</span></div>
+              </div>
+            </div>
+          </div>
+        `,
+        notes: "Nói bằng ví dụ đời thường: không ai để hoá đơn, lịch họp, kế hoạch du lịch, review code trong cùng một tờ giấy rồi bắt người khác nhớ hết."
+      },
+      {
+        category: "TRÍ NHỚ",
+        title: "Chat history không phải trí nhớ",
+        insight: "Tin nhắn cũ chỉ là đống nguyên liệu. Cái đáng nhớ phải được ghi lại gọn gàng.",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
+            <div class="thin-card p-5 space-y-3 border-rose/25">
+              <div class="mono text-rose font-bold">Sai</div>
+              <div class="text-slate-300">Mỗi lần hỏi lại, bắt nó đọc lại cả đống chat cũ rồi hy vọng nó hiểu.</div>
+              <div class="text-slate-500 text-xs">Đọc lại hết. Cầu may.</div>
+            </div>
+            <div class="thin-card p-5 space-y-3 border-mint/25">
+              <div class="mono text-mint font-bold">Đúng</div>
+              <div class="text-slate-300">Chốt gì quan trọng thì bảo Xu ghi thành một mẩu ngắn, lần sau lấy đúng mẩu đó ra.</div>
+              <div class="text-slate-500 text-xs">Ghi ít thôi, nhưng ghi đúng.</div>
+            </div>
+          </div>
+          <pre class="mt-5 thin-card p-4 text-xs mono text-slate-300 overflow-hidden">Goal:
+Context:
+Constraints:
+Known links/files:
+Decision needed:
+Next action requested:</pre>
+        `,
+        notes: "Điểm cần nói thẳng: Xu chưa tự biết cái gì nên lưu. Mình phải bảo nó lưu. Nhưng đó cũng là điểm tốt: memory có chủ ý, không phải gom rác tự động."
+      },
+      {
+        category: "QUYỀN RIÊNG TƯ",
+        title: "Cho AI quyền kiểu đưa chìa khoá nhà",
+        insight: "Muốn nó làm việc thật thì phải cấp quyền. Nhưng cấp quyền bừa là tự rước rủi ro.",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-brass font-bold">AgentMail</div>
+              <div class="text-slate-300">Nếu cần email, nó dùng email riêng. Không dùng Gmail cá nhân của mình.</div>
+            </div>
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-blue font-bold">Ghi chú đã lọc</div>
+              <div class="text-slate-300">Chỉ đưa cho nó phần cần biết. Không mở nguyên kho cá nhân.</div>
+            </div>
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-mint font-bold">Đọc trước, ghi sau</div>
+              <div class="text-slate-300">Công cụ mới ban đầu chỉ cho đọc. Muốn ghi gì thì phải có bước kiểm lại.</div>
+            </div>
+          </div>
+        `,
+        notes: "Nói bằng ví dụ nhân viên mới: không ai mới vào công ty đã cầm toàn bộ chìa khoá. AI cũng vậy."
+      },
+      {
+        category: "QUYỀN HẠN",
+        title: "Xu được làm gì, mình phải ghi ra trước",
+        insight: "Đây là phần quan trọng nhất: không phải tin Xu ngoan, mà là giới hạn việc Xu được phép làm.",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-5 text-sm">
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-mint font-bold">Cho làm</div>
+              <div class="grid grid-cols-2 gap-2 text-slate-300">
+                <div class="p-2 bg-black/20 rounded-md">web-search</div>
+                <div class="p-2 bg-black/20 rounded-md">safe-crawl</div>
+                <div class="p-2 bg-black/20 rounded-md">kb-search</div>
+                <div class="p-2 bg-black/20 rounded-md">kb-save</div>
+                <div class="p-2 bg-black/20 rounded-md">github-review</div>
+                <div class="p-2 bg-black/20 rounded-md">ask Vé Tháng</div>
+              </div>
+            </div>
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-rose font-bold">Chưa cho làm</div>
+              <div class="space-y-2 text-slate-300">
+                <div>Không chạy lệnh linh tinh.</div>
+                <div>Không Gmail cá nhân.</div>
+                <div>Không tự sửa/merge code.</div>
+                <div>Không tự nhắc việc nếu chưa kiểm thử vòng gửi.</div>
+              </div>
+            </div>
+          </div>
+        `,
+        notes: "Không cần đọc tên tool nếu audience non-tech. Chỉ nói: những ô bên trái là chìa khoá mình đưa cho Xu, bên phải là những cửa mình cố tình chưa mở."
+      },
+      {
+        category: "THỰC TẾ",
+        title: "Cái này có lỗi thật, và mình đã phải sửa thật",
+        insight: "Phần đáng kể không phải là bot trả lời được. Là lúc nó sai, mình nhìn ra sai ở đâu.",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs md:text-sm">
+            <div class="thin-card p-4 border-mint/25">
+              <div class="mono text-mint font-bold">Discord</div>
+              <div class="text-slate-300 mt-2">4 bot đang chạy trên server riêng.</div>
+            </div>
+            <div class="thin-card p-4 border-brass/25">
+              <div class="mono text-brass font-bold">Allowlist</div>
+              <div class="text-slate-300 mt-2">Xu chỉ được dùng vài công cụ đã chọn.</div>
+            </div>
+            <div class="thin-card p-4 border-blue/25">
+              <div class="mono text-blue font-bold">Memory</div>
+              <div class="text-slate-300 mt-2">Có nơi ghi lại quyết định và việc chưa xong.</div>
+            </div>
+            <div class="thin-card p-4 border-rose/25">
+              <div class="mono text-rose font-bold">Bug thật</div>
+              <div class="text-slate-300 mt-2">Có lần Xu dùng sai cách, hệ thống chặn lại.</div>
+            </div>
+          </div>
+          <div class="mt-5 thin-card p-4 mono text-xs text-slate-300">
+            Sau khi sửa: <span class="text-mint">tag đúng bot, đúng channel, đúng việc</span> thì chạy ổn.
+          </div>
+        `,
+        notes: "Kể như chuyện hậu trường: nó từng bị chặn vì gọi tool sai. Mình không mở toang quyền cho dễ, mà sửa cách gọi. Đây là bài học hay hơn cả demo chạy mượt."
+      },
+      {
+        category: "LUỒNG VIỆC",
+        title: "Một việc đi qua hệ này như thế nào?",
+        insight: "Không phải hỏi một câu rồi thôi. Nó có nhận việc, chia việc, làm sâu, rồi ghi lại.",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs md:text-sm">
+            <div class="thin-card p-4">
+              <div class="mono text-brass font-bold">1. Ném việc vào</div>
+              <div class="text-slate-300 mt-2">Xu nhận câu hỏi, link, PR, ý tưởng side project.</div>
+            </div>
+            <div class="thin-card p-4">
+              <div class="mono text-mint font-bold">2. Xu hỏi lại</div>
+              <div class="text-slate-300 mt-2">Việc này cần tìm nguồn, nghĩ sâu, hay soi code?</div>
+            </div>
+            <div class="thin-card p-4">
+              <div class="mono text-blue font-bold">3. Tìm dữ liệu</div>
+              <div class="text-slate-300 mt-2">Lấy nguồn, đọc ghi chú cũ, gom lại thành brief.</div>
+            </div>
+            <div class="thin-card p-4">
+              <div class="mono text-white font-bold">4. Gọi đúng người</div>
+              <div class="text-slate-300 mt-2">Việc khó thì gọi Vé Tháng, Chùa hoặc Thợ.</div>
+            </div>
+            <div class="thin-card p-4">
+              <div class="mono text-brass font-bold">5. Ghi lại</div>
+              <div class="text-slate-300 mt-2">Chốt xong thì lưu decision và next action.</div>
+            </div>
+          </div>
+        `,
+        notes: "Nói như đang kể flow làm việc của mình, không bán platform. Điểm ăn tiền là cuối cùng có next action, không rơi vào một đoạn chat chết."
+      },
+      {
+        category: "DEMO",
+        title: "Demo đừng hỏi câu cho vui",
+        insight: "Phải cho mọi người thấy một việc mơ hồ được biến thành việc có next action.",
+        content: `
+          <div class="thin-card p-5 space-y-4 text-sm">
+            <div class="mono text-mint font-bold">Kịch bản ngắn</div>
+            <div class="space-y-3 text-slate-200">
+              <div><code class="text-brass">#research-desk: @Xu kiểm chứng 3 nguồn cho ý tưởng demo này.</code></div>
+              <div><code class="text-brass">#demo-stage: @Xu tóm tắt thành brief cho Vé Tháng.</code></div>
+              <div><code class="text-brass">@Vé Tháng dựa trên brief, chốt demo script 5 phút.</code></div>
+              <div><code class="text-brass">@Xu lưu decision cuối vào open-loops.</code></div>
+            </div>
+            <div class="text-slate-500 text-xs">Không demo Gmail. Không demo 4 bot cãi nhau. Không khoe cái chưa test.</div>
+          </div>
+        `,
+        notes: "Đây là phần phải tập trước. Mục tiêu không phải câu trả lời hay nhất, mà là người nghe thấy flow: mơ hồ -> rõ việc -> gọi đúng bot -> lưu lại."
+      },
+      {
+        category: "CHI PHÍ",
+        title: "Muốn tiết kiệm thì đừng bắt nó nhớ quá nhiều",
+        insight: "Câu rẻ nhất là câu không phải lôi lại cả một lịch sử chat dài.",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm">
+            <div class="thin-card p-5 space-y-3 border-rose/25">
+              <div class="mono text-rose font-bold">Đốt token</div>
+              <div class="text-slate-300">Một kênh làm tất cả, đổi chủ đề liên tục, bot trả lời qua lại cho vui.</div>
+            </div>
+            <div class="thin-card p-5 space-y-3 border-mint/25">
+              <div class="mono text-mint font-bold">Tiết kiệm token</div>
+              <div class="text-slate-300">Mỗi việc đúng chỗ, tóm tắt trước khi dài quá, chỉ gọi bot cần gọi.</div>
+            </div>
+          </div>
+          <div class="mt-5 p-4 rounded-lg bg-mint/10 border border-mint/25 text-center text-slate-200 font-semibold">
+            Nếu nó đang ngu đi, đừng cho nó thêm context. Hãy cắt bớt context.
+          </div>
+        `,
+        notes: "Nói thẳng: 9router hay model rẻ giúp một phần, nhưng tiết kiệm lớn nhất đến từ việc đừng nhét mọi thứ vào một phiên chat."
+      },
+      {
+        category: "TIẾP THEO",
+        title: "Hiện tại nó chưa phải Jarvis",
+        insight: "Nó đã hữu ích rồi, nhưng vẫn còn vài phần mình chưa dám bật bừa.",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-brass font-bold">1. AgentMail</div>
+              <div class="text-slate-300">Cho nó email riêng, không đụng inbox cá nhân.</div>
+            </div>
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-blue font-bold">2. Nhắc việc thật</div>
+              <div class="text-slate-300">Chỉ bật khi đã chắc là nhắc đúng, không spam.</div>
+            </div>
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-mint font-bold">3. Tự cập nhật hơn</div>
+              <div class="text-slate-300">Dự án đổi trạng thái thì tự nhắc mình ghi lại.</div>
+            </div>
+          </div>
+        `,
+        notes: "Đừng overclaim. Nói rõ cái chưa làm để người nghe tin cái đã làm hơn."
+      },
+      {
+        category: "KẾT",
+        title: "Điểm mình rút ra",
+        insight: "Muốn AI hữu ích hơn, nhiều khi không phải đổi model. Là đổi cách mình giao việc cho nó.",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-mint font-bold">1. Rõ vai</div>
+              <div class="text-slate-300">Ai nhận việc, ai đọc dài, ai soi code, ai chốt hướng.</div>
+            </div>
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-brass font-bold">2. Sạch context</div>
+              <div class="text-slate-300">Đừng để mọi thứ chết trong một đoạn chat dài.</div>
+            </div>
+            <div class="thin-card p-5 space-y-3">
+              <div class="mono text-blue font-bold">3. Rõ ranh giới</div>
+              <div class="text-slate-300">Cấp quyền ít thôi, và kiểm tra bằng việc thật.</div>
+            </div>
+          </div>
+          <div class="mt-5 p-5 rounded-lg bg-white/[0.04] border border-white/10 text-center text-xl md:text-2xl font-black text-white">
+            Mình không cố làm AI thông minh hơn. Mình cố làm cách dùng AI bớt loạn hơn.
+          </div>
+        `,
+        notes: "Kết bằng câu đời thường. Không cần dùng chữ office operating system nếu thấy xa audience. Câu này đúng tone hơn: mình không làm AI thông minh hơn, mình làm cách dùng AI bớt loạn hơn."
+      }
+    ];
+
+    let currentSlide = 0;
+    const totalSlides = SLIDES.length;
+
+    function renderSlide(index) {
+      if (index < 0) index = 0;
+      if (index >= totalSlides) index = totalSlides - 1;
+      currentSlide = index;
+
+      const slide = SLIDES[currentSlide];
+      document.getElementById('slideCategory').textContent = slide.category;
+      document.getElementById('currentSlideNum').textContent = String(currentSlide + 1).padStart(2, '0');
+      document.getElementById('totalSlidesNum').textContent = String(totalSlides).padStart(2, '0');
+      document.getElementById('progressBar').style.width = `${((currentSlide + 1) / totalSlides) * 100}%`;
+
+      const container = document.getElementById('slideContent');
+      container.innerHTML = `
+        <div class="space-y-5">
+          <div class="space-y-2 max-w-5xl">
+            <h2 class="text-3xl md:text-5xl font-black text-white leading-tight">${slide.title}</h2>
+            <p class="text-slate-400 text-sm md:text-lg font-normal max-w-4xl">${slide.insight}</p>
+          </div>
+          <div class="pt-1">${slide.content}</div>
+        </div>
+      `;
+
+      document.getElementById('speakerNotesContent').textContent = slide.notes;
+      container.classList.remove('slide-enter');
+      void container.offsetWidth;
+      container.classList.add('slide-enter');
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides - 1) renderSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      if (currentSlide > 0) renderSlide(currentSlide - 1);
+    }
+
+    function toggleNotes() {
+      document.getElementById('speakerNotesDrawer').classList.toggle('hidden');
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key === 's' || e.key === 'S') {
+        toggleNotes();
+      } else if (e.key === 'f' || e.key === 'F') {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen().catch(() => {});
+        } else {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    });
+
+    const requestedSlide = Number(new URLSearchParams(window.location.search).get('slide'));
+    renderSlide(Number.isInteger(requestedSlide) && requestedSlide > 0 ? requestedSlide - 1 : 0);
+  </script>
+</body>
+</html>

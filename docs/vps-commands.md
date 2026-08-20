@@ -78,6 +78,7 @@ Use channel ids carefully:
 - `#video-maker`: `REDACTED_CHANNEL_ID`
 - `#research-desk`: `REDACTED_CHANNEL_ID`
 - `#general`: `REDACTED_CHANNEL_ID`
+- `#demo-stage`: `REDACTED_CHANNEL_ID`
 
 ```bash
 cd /home/openclaw/REDACTED-REPO-PATH

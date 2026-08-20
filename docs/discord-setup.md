@@ -30,19 +30,17 @@ it cannot fail open". That is wrong, and the gateway log shows why:
 ```
 
 OpenClaw removes the six tools from its own surface, and two seconds later hands
-the turn to the `claude-cli` backend — Claude Code running in a terminal with
-its own Bash, Write and Edit tools, which the deny list never names and cannot
-reach.
+the turn to a CLI backend running in a terminal with its own command surface.
+The deny list never names that inner tool surface and cannot reach it.
 
-Observed, not inferred: on 15/8 the `claude` agent was asked in Discord to run
-the master step, and it ran `scripts/master.mjs`, reported the measured loudness
-change, and later killed the process holding port 8000. Every one of those is a
-tool the config denies.
+The quoted line above is from a legacy Claude experiment, not the current demo
+roster. The lesson still applies to the current CLI-backed specialists
+(`qoder-cli` for Thợ and `codex-cli` for Vé Tháng): assume any CLI-backed agent
+can do what the logged-in Linux user can do.
 
 So the deny list is real for agents on an API backend and cosmetic for agents on
 a CLI backend. Same family as the sandbox note above: a control that reports
-success while the agent runs on the host as the logged-in user. Assume any
-CLI-backed agent can run anything the logged-in user can.
+success while the agent runs on the host as the logged-in user.
 
 Two consequences worth carrying into the demo. Scope every instruction narrowly
 — "run the master step on this file" rather than "tidy up" — because there is

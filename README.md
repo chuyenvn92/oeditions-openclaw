@@ -14,7 +14,7 @@
 | **🔧 Thợ** | `qoder` | Qoder CLI (`qoder-cli/auto`) | Dùng token cá nhân | Soi code, rà soát diff, tìm rủi ro logic |
 | **🎫 Vé Tháng** | `codex` | Codex CLI (`codex-cli/gpt-5.4`) | Trọn gói ChatGPT Plus | Suy luận dài, lập kế hoạch phức tạp |
 
-> Còn một persona thứ 5, **`claude`** (`personas/claude/`), dùng làm reviewer nội bộ — không gắn bot Discord riêng, các bot khác tham vấn nó qua agent-to-agent thay vì tag trong kênh. Không nằm trong 4 bước cài đặt nhanh dưới đây; muốn dùng thì tự `openclaw agents add claude ...` rồi chạy lại `scripts/apply-personas.sh`.
+> Bản demo hiện tại chỉ chốt 4 bot trên. Không cần Claude để kể câu chuyện này.
 
 ---
 
@@ -139,6 +139,22 @@ scripts/add-bot.sh codex    ve-thang-bot ~/discord-ve-thang.token
 # Xoá file token tạm để bảo mật
 rm ~/discord-*.token
 ```
+
+---
+
+### Bước 3.5: Tạo Channel Discord Gọn Để Demo
+
+Tạo các kênh này trực tiếp trong Discord server riêng:
+
+* `#general` — hỏi nhanh, triage.
+* `#research-desk` — research, kiểm chứng nguồn, gom dữ liệu.
+* `#openclaw-config` — VPS, bot binding, permission, persona.
+* `#code-review` — PR, diff, repo question.
+* `#demo-stage` — kênh sạch để chạy kịch bản demo trước buổi nói.
+
+Khuyến nghị: khóa bot theo **private guild + user allowlist**, không khóa bằng
+channel allowlist. Nếu thêm channel mới mà quên cập nhật allowlist, bot sẽ im
+lặng rất khó debug.
 
 ---
 

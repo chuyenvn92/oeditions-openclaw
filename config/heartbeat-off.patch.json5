@@ -12,8 +12,8 @@
   // array and covers every agent, now and later.
   agents: {
     defaults: {
-      // Keep chat/demo sessions from growing into the full 1M-token Claude
-      // window. Raise this for explicit long-document/coding sessions.
+      // Keep chat/demo sessions from growing into a huge cached context.
+      // Raise this only for explicit long-document/coding sessions.
       contextTokens: 120000,
       heartbeat: { every: "0m" },
     },

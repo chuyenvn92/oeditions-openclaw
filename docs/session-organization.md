@@ -14,6 +14,8 @@ Each Discord channel should map to one durable work area:
 - `#code-review`: PRs, diffs, repo questions, technical review.
 - `#openclaw-config`: bot setup, permissions, persona changes, VPS ops.
 - `#video-maker`: the video/content side project.
+- `#demo-stage`: clean rehearsal channel for the talk; reset or archive old
+  threads before presenting.
 - `#general`: quick questions and triage only.
 
 If a side project becomes active for more than a few messages, give it its own

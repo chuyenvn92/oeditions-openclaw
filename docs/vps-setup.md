@@ -17,10 +17,10 @@ OpenClaw spawned. Measure descendants of the gateway pid, or measure nothing.
 
 | Backend | Extra per turn | Child processes |
 | --- | --- | --- |
+| API (`deepseek/deepseek-chat`) | HTTP call, low local memory | none |
 | API (`google/gemini-2.5-flash`) | **+27 MB** | **none** |
 | CLI `qoder` | 39 MB | 1 |
-| CLI `deepseek` | 88 MB | 1 |
-| CLI `claude` (Claude Code) | 450 MB | 1 |
+| CLI `codex` | measure on the VPS before demo | 1 |
 
 Gateway idle: ~410 MB.
 
@@ -28,14 +28,14 @@ The split that matters is not the megabytes, it is the column on the right. An
 API-backed turn is an HTTP call; a CLI-backed turn **starts a whole agent
 process**. That one fact sets the sizing:
 
-| Room | Three bots answering at once | Box |
+| Room | Concurrent answering pattern | Box |
 | --- | --- | --- |
-| All API | ~0.5 GB | 1 GB is enough |
-| Subscription / CLI | ~1.05 GB | 2 GB, comfortable at 4 GB |
+| Xu + Chùa only (API) | low local memory | 1 GB is enough |
+| Full room with Thợ/Vé Tháng active | CLI processes spawn | 2 GB minimum, 4 GB comfortable |
 
-So "you do not need a powerful machine" is true, and it is true *because* you
-paid per token. The free-because-subscription trick is the one that needs the
-bigger box, since it is the one that spawns agent processes. Say both halves.
+So "you do not need a powerful machine" is true only for the API half. The
+subscription/CLI trick is what needs the bigger box, because it launches another
+agent process. Say both halves in the talk.
 
 ## One bot token, one gateway
 
@@ -188,7 +188,24 @@ scripts/add-bot.sh codex    ve-thang-bot ~/discord-ve-thang.token
 rm ~/discord-*.token
 ```
 
-**7. Verify with traffic, not with status output.** `agents list --bindings`
+**7. Create the Discord channel layout.** This is Discord server setup, not an
+OpenClaw patch. Keep it small so the audience can understand the system:
+
+| Channel | Purpose |
+| --- | --- |
+| `#general` | quick triage, short questions |
+| `#research-desk` | source finding, verification, market/work research |
+| `#openclaw-config` | VPS, bot bindings, permissions, persona changes |
+| `#code-review` | PRs, diffs, repo-specific technical review |
+| `#demo-stage` | clean end-to-end demo thread for the talk |
+
+Do **not** add these channel ids to `channels.discord.guilds[*].channels` unless
+you really need a channel allowlist. The safer default for this private server is
+restricting to the guild and one user, then allowing any channel inside that
+guild. A new channel that is missing from a channel allowlist fails silently:
+the bot receives nothing, logs nothing useful, and looks broken.
+
+**8. Verify with traffic, not with status output.** `agents list --bindings`
 showing a route proves the config, not the running process — bindings are read
 when the gateway starts, so a binding added afterwards routes to the default
 agent while every surface reports success. Restart, then tag each bot and check
