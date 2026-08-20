@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Fixed entrypoint for open-loops.py — one script name for the exec allowlist.
+#
+#   scripts/open-loops [--raw|--template]
+set -euo pipefail
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+. "$DIR/scripts/env.sh"
+load_standard_env "$DIR"
+exec python3 "$DIR/scripts/open-loops.py" "$@"

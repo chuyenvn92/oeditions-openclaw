@@ -9,7 +9,7 @@ Security/reliability foundation, verified end to end:
 
 - Exec is deny-by-default for Xu. Allowlist has wrapper scripts (checked live
   via `openclaw approvals get`): `safe-crawl`, `browser-use-run`, `kb-search`,
-  `github-review`, `web-search`, `kb-save`, and `ask-agent`.
+  `github-review`, `web-search`, `kb-save`, `open-loops`, and `ask-agent`.
   `github-review` also has explicit flag patterns for `--review-requests` and
   `--review-requests *`. No bare `curl`/`python3`/anything else gets through.
   `ask-agent` is additionally hard-gated in the script to `codex` only.
@@ -38,6 +38,8 @@ Security/reliability foundation, verified end to end:
 - Search the user's own notes/decisions automatically when a message looks like
   it needs them (`kb-recall` hook + `kb-search`).
 - Save durable notes/decisions to the private KB (`kb-save`), then re-index.
+- Read the curated open-loops board (`open-loops`) for side-project status,
+  next action, owner, and the channel/thread where the work should continue.
 - Pull a GitHub PR's title, description, changed files, and diff for a quick
   read (`github-review`), read-only.
 - List open GitHub PRs requesting Chuyên's review
@@ -71,9 +73,9 @@ wrapper-level exec allowlist.
    wrote `~/data/reminders.json`; no verified worker delivered those reminders.
    It is deliberately not advertised in Xu's persona until a delivery loop is
    installed and tested.
-3. **No real memory beyond the 2 fixed cron slots.** Xu doesn't decide *what*
-   to check or *when* — it only runs the two jobs on their fixed schedule.
-   There's no "remember I asked about X, follow up later" capability.
+3. **Open-loops is curated, not automatic.** Xu can read the board, but it does
+   not yet discover stale work by itself from Discord/GitHub/email. Someone or
+   a future workflow still has to update `open-loops.md`.
 4. **Can't take an ad-hoc "go check this for me" request** outside the
    allowlisted scripts. Anything not already wired as a script is a hard
    deny, by design — safe, but it means every new capability is still a
