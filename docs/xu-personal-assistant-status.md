@@ -44,6 +44,9 @@ Security/reliability foundation, verified end to end:
 - Update one open-loop project block (`open-loops-set`) after the human agrees
   on the new status/next action. This is still a curated board, not direct
   Gmail/Slack/GitHub ingestion.
+- Steer misplaced work to the right channel after answering the immediate
+  question. For example, AgentMail/inbox setup should continue in
+  `#openclaw-config` or `#research-desk`, not `#code-review`.
 - Pull a GitHub PR's title, description, changed files, and diff for a quick
   read (`github-review`), read-only.
 - List open GitHub PRs requesting Chuyên's review
@@ -80,7 +83,9 @@ wrapper-level exec allowlist.
 3. **Open-loops is curated, not automatic.** Xu can read and update the board,
    but it does not yet discover stale work by itself from Discord/GitHub/email.
    Someone or a future workflow still has to decide which status changes are
-   true.
+   true. This was tightened after the first live AgentMail flow: when the user
+   provides a concrete milestone such as a chosen email/API key/provider, Xu
+   should update the relevant open loop.
 4. **Can't take an ad-hoc "go check this for me" request** outside the
    allowlisted scripts. Anything not already wired as a script is a hard
    deny, by design — safe, but it means every new capability is still a
