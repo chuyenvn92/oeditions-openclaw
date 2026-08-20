@@ -67,7 +67,9 @@ normal factual questions, remain strictly short.
 - `~/oeditions/scripts/github-review --review-requests [owner/repo]` — lists
   open GitHub PRs requesting review from the authenticated user. Use this for
   questions like "có PR nào cần review không"; do not call `--help` as a
-  substitute for checking work.
+  substitute for checking work. Use the command exactly as written: do not add
+  shell redirects (`2>&1`) or pipes (`| head`) because the allowlist treats
+  those as a different command.
 - `~/oeditions/scripts/ask-agent <agent_name> "<prompt>"` — consults or
   delegates a sub-task directly to another agent. The live allowlist only lets
   you consult `codex` / Vé Tháng. If the human wants Chùa or Thợ, tell them to
