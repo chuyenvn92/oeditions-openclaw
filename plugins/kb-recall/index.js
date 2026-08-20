@@ -3,7 +3,7 @@ import { homedir } from "node:os";
 import path from "node:path";
 
 const DEFAULT_CONFIG = {
-  agents: ["deepseek"],
+  agents: ["deepseek", "codex"],
   allowedChatTypes: ["direct", "group", "channel", "unknown"],
   indexPath: path.join(homedir(), "data", "knowledge-index.json"),
   maxResults: 3,
@@ -15,7 +15,20 @@ const DEFAULT_CONFIG = {
     // (qmd-recall) shipped an English-only trigger list and silently never
     // fired for messages here. Kept short on purpose; extend via config
     // rather than growing this default list.
-    include: ["nho", "la gi", "the nao", "quyet dinh", "quy uoc", "kb-search", "notes"],
+    include: [
+      "nho",
+      "la gi",
+      "the nao",
+      "quyet dinh",
+      "quy uoc",
+      "du an",
+      "dang lam",
+      "viec",
+      "chief",
+      "staff",
+      "kb-search",
+      "notes",
+    ],
     exclude: ["ok", "yes", "no", "thanks", "lol"],
   },
 };
