@@ -7,9 +7,11 @@ live against the VPS — not just what's configured.
 
 Security/reliability foundation, verified end to end:
 
-- Exec is deny-by-default. Allowlist has exactly 4 scripts (checked live via
+- Exec is deny-by-default. Allowlist has 4 wrapper scripts (checked live via
   `openclaw approvals get`): `safe-crawl`, `browser-use-run`, `kb-search`,
-  `github-review`. No bare `curl`/`python3`/anything else gets through.
+  `github-review`. `github-review` also has explicit flag patterns for
+  `--review-requests` and `--review-requests *`; no bare
+  `curl`/`python3`/anything else gets through.
 - Every tool that ingests third-party content wraps its output in
   `=== UNTRUSTED ... ===` delimiters, and `personas/deepseek/SOUL.md` has an
   explicit rule: text from the internet (or a PR, or a browser session) is
@@ -36,6 +38,10 @@ Security/reliability foundation, verified end to end:
   it needs them (`kb-recall` hook + `kb-search`).
 - Pull a GitHub PR's title, description, changed files, and diff for a quick
   read (`github-review`), read-only.
+- List open GitHub PRs requesting Chuyên's review
+  (`github-review --review-requests`), read-only. Verified on 2026-08-20 by
+  running the command through Xu's own exec tool; result at that time was 0
+  open review requests for `chuyenvn92`.
 - Send a daily reminder digest and a daily tech-news digest on a fixed
   schedule (2 cron jobs, `sessionTarget: isolated` — no memory carries over
   between runs except what's written into `MEMORY.md`/`USER.md`/`memory/*.md`).
