@@ -122,7 +122,7 @@ def build_ai_news_message() -> tuple[str, list[dict]]:
         "📢 **[PROACTIVE_DIGEST] ⚡ BẢN TIN CÔNG NGHỆ & AI NÓNG HỔI**\n\n"
         f"Xin chào cả nhà! 🪙 **Xu** tổng hợp nhanh tiêu điểm công nghệ & cộng đồng dev hôm nay:\n\n"
         f"{hn_lines}\n\n"
-        "💡 *Anh em quan tâm chủ đề nào nhất cần đào sâu thì tag `@Chùa` (đọc bài dài) hoặc `@Thợ` (soi code/architecture) nhé!*"
+        "💡 *Anh em quan tâm chủ đề nào nhất cần đào sâu thì tag `@Xu` để research hoặc `@Thợ` để soi code/architecture nhé!*"
     )
     
     embed = {
@@ -130,7 +130,7 @@ def build_ai_news_message() -> tuple[str, list[dict]]:
         "description": "Tin tức chọn lọc từ HackerNews, AI Research và GitHub Trending",
         "color": 0xF39C12,
         "fields": [
-            {"name": "🤖 AI Frontier", "value": "Cuộc đua open-weights LLMs: DeepSeek V3 vs Claude vs Gemini 2.5 Flash tối ưu chi phí token.", "inline": False},
+            {"name": "🤖 AI Frontier", "value": "Cuộc đua open-weights LLMs và agentic workflow đang đẩy AI từ chat sang làm việc có quy trình.", "inline": False},
             {"name": "🛠️ Tooling & Dev", "value": "Agentic coding & CLI backends (Qoder, Codex) đang trở thành tiêu chuẩn mới.", "inline": False},
         ],
         "footer": {"text": f"Oeditions OpenClaw • {datetime.now().strftime('%d/%m/%Y %H:%M')}"}
@@ -164,18 +164,16 @@ def build_roundtable_message() -> tuple[str, list[dict]]:
     content = (
         "🎙️ **[BÀN TRÒN AI] 🔥 CHỦ ĐỀ TRANH LUẬN HÔM NAY: AI Coding CLI vs GUI IDE**\n\n"
         "🪙 **Xu**: *\"Theo thống kê token, chạy AI qua CLI backend (như Qoder CLI hay Codex CLI) tiết kiệm 60% chi phí so với các plugin IDE cồng kềnh.\"*\n\n"
-        "🆓 **Chùa**: *\"Nhưng IDE có context visual toàn bộ dự án, Gemini đọc 1 triệu tokens liền một mạch không cần chia nhỏ!\"*\n\n"
         "🔧 **Thợ**: *\"Quan trọng là ai bắt được bug ở dòng code thực tế. Terminal output không biết nói dối, diff gọn là win.\"*\n\n"
         "🎫 **Vé Tháng**: *\"Cả hai đều cần suy luận nhiều bước (multi-step planning). Nếu roadmap ban đầu sai thì CLI hay IDE đều đập đi viết lại.\"*\n\n"
         "👉 **Mọi người trong phòng vote theo phe nào? Bật mí quan điểm bên dưới nhé!**"
     )
     embed = {
         "title": "⚔️ AI Debate: CLI Power vs Large Context IDE",
-        "description": "Cả 4 bot đại diện cho 4 trường phái AI cùng lên tiếng.",
+        "description": "Ba bot đại diện cho ba kiểu việc: triage, review, và deep work.",
         "color": 0x9B59B6,
         "fields": [
             {"name": "🪙 Xu (DeepSeek)", "value": "Thực dụng, tốc độ, tối ưu chi phí từng token.", "inline": True},
-            {"name": "🆓 Chùa (Gemini)", "value": "Bao quát tài liệu khổng lồ 1M+ context.", "inline": True},
             {"name": "🔧 Thợ (Qoder)", "value": "Soi diff, kiểm tra syntax, thực chiến local.", "inline": True},
             {"name": "🎫 Vé Tháng (Codex)", "value": "Tư duy chiến lược, quy hoạch dự án.", "inline": True},
         ],
@@ -194,7 +192,7 @@ def build_dev_pulse_message() -> tuple[str, list[dict]]:
     )
     embed = {
         "title": "⚡ OpenClaw Workspace Ready",
-        "description": "Tất cả 4 Agent đang ở trạng thái Online & sẵn sàng nhận lệnh.",
+        "description": "Ba agent đang ở trạng thái online và sẵn sàng nhận việc.",
         "color": 0x3498DB,
         "footer": {"text": f"Hệ thống tự động • {datetime.now().strftime('%d/%m/%Y %H:%M')}"}
     }

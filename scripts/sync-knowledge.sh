@@ -13,8 +13,9 @@ set -euo pipefail
 ZONE="${ZONE:?set ZONE, e.g. your-cloud-zone}"
 INSTANCE="${INSTANCE:?set INSTANCE, e.g. my-openclaw-vps}"
 KNOWLEDGE_SRC="${KNOWLEDGE_SRC:?set KNOWLEDGE_SRC to the local folder containing .md notes}"
-REMOTE_REPO="${REMOTE_REPO:-/home/openclaw/REDACTED-REPO-PATH}"
-REMOTE_KNOWLEDGE_DIR="${REMOTE_KNOWLEDGE_DIR:-/home/openclaw/data/knowledge}"
+REMOTE_USER="${REMOTE_USER:-openclaw}"
+REMOTE_REPO="${REMOTE_REPO:-/home/$REMOTE_USER/oeditions-openclaw}"
+REMOTE_KNOWLEDGE_DIR="${REMOTE_KNOWLEDGE_DIR:-/home/$REMOTE_USER/data/knowledge}"
 
 [ -d "$KNOWLEDGE_SRC" ] || { echo "not found: $KNOWLEDGE_SRC" >&2; exit 1; }
 
@@ -29,9 +30,9 @@ gcloud compute ssh "$INSTANCE" --zone "$ZONE" --command '
   sudo mkdir -p '"$REMOTE_KNOWLEDGE_DIR"'
   sudo rm -f '"$REMOTE_KNOWLEDGE_DIR"'/*.md
   sudo cp /tmp/knowledge-sync/*.md '"$REMOTE_KNOWLEDGE_DIR"'/
-  sudo chown openclaw:openclaw '"$REMOTE_KNOWLEDGE_DIR"'/*.md
+  sudo chown '"$REMOTE_USER:$REMOTE_USER"' '"$REMOTE_KNOWLEDGE_DIR"'/*.md
   sudo rm -rf /tmp/knowledge-sync
-  sudo -u openclaw -H bash -c "
+  sudo -u '"$REMOTE_USER"' -H bash -c "
     cd '"$REMOTE_REPO"'/scripts
     python3 kb-index.py
   "

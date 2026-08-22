@@ -31,7 +31,6 @@ Almost every command below must run as `openclaw`. From your personal user,
 | Discord bot | Account | Agent | Model | Pays how |
 | --- | --- | --- | --- | --- |
 | 🪙 Xu | `xu-bot` | `deepseek` | `deepseek/deepseek-chat` | API key |
-| 🆓 Chùa | `chua-bot` | `gemini` | `google/gemini-2.5-flash` | free tier, 5 req/min |
 | 🔧 Thợ | `thoi-bot` | `qoder` | `qoder-cli/auto` | personal token |
 | 🎫 Vé Tháng | `ve-thang-bot` | `codex` | `codex-cli/gpt-5.4` | ChatGPT subscription |
 
@@ -82,7 +81,6 @@ A session key of `agent:main:...` means the binding did not load.
 | --- | --- |
 | Discord bot tokens | `~/.openclaw/openclaw.json` on the server, plain text, mode 600 |
 | DeepSeek API key | `~/.openclaw/openclaw.json`, under `models.providers` |
-| Gemini API key | `~/.openclaw/openclaw.json`, under `models.providers` |
 | Qoder token | `~/.openclaw/secrets.env`, read by `~/qoder-cli.sh` |
 | Codex | ChatGPT OAuth, `codex login --device-auth`; check expiry/status on the VPS |
 
@@ -106,6 +104,6 @@ openclaw channels logs --channel discord --lines 200
 ```
 
 In the Discord log, every bot account that was *not* mentioned writes its own
-`no-mention` line. With four accounts: four such lines means nobody was tagged
-(usually a name typed as text instead of picked from autocomplete); three means
+`no-mention` line. With three accounts: three such lines means nobody was tagged
+(usually a name typed as text instead of picked from autocomplete); two means
 one bot accepted it.

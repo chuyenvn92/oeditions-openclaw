@@ -18,7 +18,6 @@ OpenClaw spawned. Measure descendants of the gateway pid, or measure nothing.
 | Backend | Extra per turn | Child processes |
 | --- | --- | --- |
 | API (`deepseek/deepseek-chat`) | HTTP call, low local memory | none |
-| API (`google/gemini-2.5-flash`) | **+27 MB** | **none** |
 | CLI `qoder` | 39 MB | 1 |
 | CLI `codex` | measure on the VPS before demo | 1 |
 
@@ -30,7 +29,7 @@ process**. That one fact sets the sizing:
 
 | Room | Concurrent answering pattern | Box |
 | --- | --- | --- |
-| Xu + Chùa only (API) | low local memory | 1 GB is enough |
+| Xu only (API) | low local memory | 1 GB is enough |
 | Full room with Thợ/Vé Tháng active | CLI processes spawn | 2 GB minimum, 4 GB comfortable |
 
 So "you do not need a powerful machine" is true only for the API half. The
@@ -149,10 +148,9 @@ binary — see `config/cli-backends.generated.patch.json5`.
 
 **5. Authenticate the models.**
 
-- **DeepSeek, Gemini, Qoder** — Put the DeepSeek API key in
-  `~/.openclaw/openclaw.json` (under `models.providers`) or environment, put
-  the Gemini key in `~/.openclaw/openclaw.json` (under `models.providers`) or
-  environment, and put the Qoder token in `.env` or `~/.openclaw/secrets.env`.
+- **DeepSeek, Qoder** — Put the DeepSeek API key in `~/.openclaw/openclaw.json`
+  (under `models.providers`) or environment, and put the Qoder token in `.env`
+  or `~/.openclaw/secrets.env`.
 - **Codex** — `codex login --device-auth` **(TTY, on the VPS)**. It prints a code
   to approve from any other device. Do not copy `~/.codex/auth.json` across:
   it works until it silently does not, which is the worst failure mode to
@@ -164,16 +162,13 @@ Check before moving on:
 codex login status        # expect: Logged in using ChatGPT
 ```
 
-**6. Create and attach the bots.** Four agents and four bot tokens, one file
+**6. Create and attach the bots.** Three agents and three bot tokens, one file
 each:
 
 ```bash
 openclaw agents add deepseek --non-interactive \
   --workspace "$HOME/.openclaw/workspaces/deepseek" \
   --model deepseek/deepseek-chat
-openclaw agents add gemini --non-interactive \
-  --workspace "$HOME/.openclaw/workspaces/gemini" \
-  --model google/gemini-2.5-flash
 openclaw agents add qoder --non-interactive \
   --workspace "$HOME/.openclaw/workspaces/qoder" \
   --model qoder-cli/auto
@@ -182,7 +177,6 @@ openclaw agents add codex --non-interactive \
   --model codex-cli/gpt-5.4
 
 scripts/add-bot.sh deepseek xu-bot       ~/discord-xu.token
-scripts/add-bot.sh gemini   chua-bot     ~/discord-chua.token
 scripts/add-bot.sh qoder    thoi-bot     ~/discord-thoi.token
 scripts/add-bot.sh codex    ve-thang-bot ~/discord-ve-thang.token
 rm ~/discord-*.token

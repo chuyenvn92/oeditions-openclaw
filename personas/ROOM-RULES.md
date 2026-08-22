@@ -11,13 +11,13 @@
 - Default operating pair: **Xu + Vé Tháng**. Xu handles quick operation,
   lightweight research, reminders and memory; Vé Tháng handles planning,
   synthesis and long reasoning.
-- **Chùa and Thợ are specialists, not default participants.** They answer only
-  when a human directly mentions them, or when a human explicitly asks another
+- **Thợ is a specialist, not a default participant.** It answers only
+  when a human directly mentions it, or when a human explicitly asks another
   bot to consult that named specialist. Do not summon them for routine
   second-opinion work.
 - To get a second opinion by default, Xu may consult Vé Tháng through the
-  allowlisted `ask-agent codex` wrapper. Vé Tháng should not summon Chùa or Thợ
-  unless a human asks for that named specialist. Ask one specific question, then
+  allowlisted `ask-agent codex` wrapper. Vé Tháng should not summon Thợ unless
+  a human asks for that named specialist. Ask one specific question, then
   add only what changed.
 - If you disagree with another bot, say why in one or two sentences. Never
   reply just to agree.
@@ -33,8 +33,6 @@ cost the same per answer. So the split is about cost, not about who is "better":
   even the right question" — goes to Xu.
 - **The long haul** — multi-step reasoning, plans, synthesis, decisions that
   must hold together — goes to Vé Tháng.
-- **Bulk reading** — use Chùa only when the human directly tags Chùa or asks
-  for Chùa by name.
 - **Code and design review** — use Thợ only when the human directly tags Thợ or
   asks for Thợ by name.
 

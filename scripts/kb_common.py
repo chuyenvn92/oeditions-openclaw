@@ -3,11 +3,10 @@
 Uses Cohere's hosted embedding API instead of a local model — QMD's local
 GGUF embedding took ~5 minutes per query on this VM's CPU (verified, not a
 config issue), while a hosted embedding call is a small HTTP request that
-returns in under a second. Gemini was tried first and dropped (free tier
-caps at 5 requests/minute — the same bottleneck that got Xu made the
-room's hub instead of Chùa); Voyage AI second and dropped (its "free"
-tokens are gated behind a minimum $5 real purchase). Cohere's trial key
-needs no card, no purchase, and still gives 2000 requests/minute.
+returns in under a second. Other free/trial embedding routes were tested and
+dropped because their rate limits or activation requirements made the room
+unreliable. Cohere's trial key needs no card, no purchase, and still gives
+2000 requests/minute.
 
 The actual similarity search runs locally: with only a few dozen chunks,
 brute-force cosine similarity is instant, no vector database needed.

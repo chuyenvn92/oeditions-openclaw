@@ -1,12 +1,14 @@
-# VPS command cheat sheet
+# VPS command cheat sheet — template
 
-Private ops notes for the live OpenClaw VPS.
+Public-safe ops commands for a deployed OpenClaw VPS. Replace every value in
+angle brackets with your own instance, zone, paths, and channel ids.
 
 ## Connect
 
 ```bash
-gcloud compute ssh openclaw@REDACTED-VPS-HOST --zone=REDACTED-ZONE
-cd /home/openclaw/REDACTED-REPO-PATH
+gcloud compute ssh <instance-name> --zone=<zone>
+sudo -u openclaw -i
+cd <repo-path>
 ```
 
 ## Edit secrets safely
@@ -14,8 +16,8 @@ cd /home/openclaw/REDACTED-REPO-PATH
 Do not paste API keys into Discord. Put them in the VPS secrets file:
 
 ```bash
-nano /home/openclaw/.openclaw/secrets.env
-chmod 600 /home/openclaw/.openclaw/secrets.env
+nano ~/.openclaw/secrets.env
+chmod 600 ~/.openclaw/secrets.env
 systemctl --user restart openclaw-gateway.service
 ```
 
@@ -28,7 +30,7 @@ AGENTMAIL_API_KEY="..."
 ## Gateway status
 
 ```bash
-/home/openclaw/node/bin/node /home/openclaw/node/lib/node_modules/openclaw/dist/index.js channels status --probe
+openclaw channels status --probe
 ```
 
 Short service checks:
@@ -42,7 +44,7 @@ journalctl --user -u openclaw-gateway.service -n 100 --no-pager
 ## Token/cost report
 
 ```bash
-cd /home/openclaw/REDACTED-REPO-PATH
+cd <repo-path>
 ./scripts/token-report --days 1 --agent deepseek
 ./scripts/token-report --days 7 --agent deepseek
 ./scripts/token-report --days 1 --agent deepseek --json
@@ -51,7 +53,7 @@ cd /home/openclaw/REDACTED-REPO-PATH
 ## Open loops
 
 ```bash
-cd /home/openclaw/REDACTED-REPO-PATH
+cd <repo-path>
 ./scripts/open-loops
 ./scripts/open-loops-set "Side-Project Inbox Identity" \
   --status "..." \
@@ -62,8 +64,8 @@ cd /home/openclaw/REDACTED-REPO-PATH
 ## Test Xu without posting to Discord
 
 ```bash
-cd /home/openclaw/REDACTED-REPO-PATH
-/home/openclaw/node/bin/node /home/openclaw/node/lib/node_modules/openclaw/dist/index.js agent \
+cd <repo-path>
+openclaw agent \
   --agent deepseek \
   --session-key agent:deepseek:manual-smoke \
   --message "Hôm nay đang có open loops nào?"
@@ -71,37 +73,30 @@ cd /home/openclaw/REDACTED-REPO-PATH
 
 ## Test Xu and post to a Discord channel
 
-Use channel ids carefully:
-
-- `#code-review`: `REDACTED_CHANNEL_ID`
-- `#openclaw-config`: `REDACTED_CHANNEL_ID`
-- `#video-maker`: `REDACTED_CHANNEL_ID`
-- `#research-desk`: `REDACTED_CHANNEL_ID`
-- `#general`: `REDACTED_CHANNEL_ID`
-- `#demo-stage`: `REDACTED_CHANNEL_ID`
+Find a channel id in Discord developer mode, then replace `<channel-id>` below.
 
 ```bash
-cd /home/openclaw/REDACTED-REPO-PATH
-/home/openclaw/node/bin/node /home/openclaw/node/lib/node_modules/openclaw/dist/index.js agent \
+cd <repo-path>
+openclaw agent \
   --agent deepseek \
-  --session-key agent:deepseek:discord:channel:REDACTED_CHANNEL_ID \
+  --session-key agent:deepseek:discord:channel:<channel-id> \
   --message "Chief-of-staff check: hôm nay đang có open loops nào?" \
   --deliver \
   --reply-channel discord \
   --reply-account xu-bot \
-  --reply-to channel:REDACTED_CHANNEL_ID
+  --reply-to channel:<channel-id>
 ```
 
 ## Discord logs
 
 ```bash
-/home/openclaw/node/bin/node /home/openclaw/node/lib/node_modules/openclaw/dist/index.js channels logs --channel discord --lines 200
+openclaw channels logs --channel discord --lines 200
 ```
 
 ## Apply persona changes after editing repo files
 
 ```bash
-cd /home/openclaw/REDACTED-REPO-PATH
+cd <repo-path>
 bash scripts/apply-personas.sh
 systemctl --user restart openclaw-gateway.service
 ```

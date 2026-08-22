@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fixed entrypoint for ask-agent.py — allows Xu to consult other agents
-# (Thợ, Chùa, Vé Tháng) directly.
+# (Thợ or another specialist) directly.
 #
 #   scripts/ask-agent <agent_name> "<prompt>"
 set -euo pipefail

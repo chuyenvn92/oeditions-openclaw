@@ -5,16 +5,15 @@
 
 ---
 
-## 👥 Biệt Đội 4 Bot Trong Phòng
+## 👥 Bộ 3 Bot Trong Phòng
 
 | Bot | Tên Agent | Mô hình & Loại kết nối | Chi phí / Cơ chế | Vai trò chính |
 | :--- | :--- | :--- | :--- | :--- |
 | **🪙 Xu** | `deepseek` | DeepSeek API (`deepseek/deepseek-chat`) | Theo API key | Đọc nhanh lượt đầu, tóm tắt, báo giá |
-| **🆓 Chùa** | `gemini` | Google Gemini (`gemini-2.5-flash`) | Miễn phí (5 req/phút) | Đọc văn bản siêu dài, tra cứu nhanh |
 | **🔧 Thợ** | `qoder` | Qoder CLI (`qoder-cli/auto`) | Dùng token cá nhân | Soi code, rà soát diff, tìm rủi ro logic |
 | **🎫 Vé Tháng** | `codex` | Codex CLI (`codex-cli/gpt-5.4`) | Trọn gói ChatGPT Plus | Suy luận dài, lập kế hoạch phức tạp |
 
-> Bản demo hiện tại chỉ chốt 4 bot trên. Không cần Claude để kể câu chuyện này.
+> Bản demo mặc định dùng 3 bot. Có thể thêm model khác sau, nhưng không cần để hiểu ý tưởng chính.
 
 ---
 
@@ -48,10 +47,10 @@ nvm use 22.22.3
 
 ## 🚀 Hướng Dẫn Cài Đặt Từng Bước (Quickstart)
 
-### Bước 1: Tạo Bot Discord & Lấy Token (Làm 4 lần cho 4 bot)
+### Bước 1: Tạo Bot Discord & Lấy Token (Làm 3 lần cho 3 bot)
 
 1. Truy cập [Discord Developer Portal](https://discord.com/developers/applications).
-2. Nhấn **New Application** → Đặt tên bot (Ví dụ: `Xu`, `Chùa`, `Thợ`, `Vé Tháng`).
+2. Nhấn **New Application** → Đặt tên bot (ví dụ: `Xu`, `Thợ`, `Vé Tháng`).
 3. Vào tab **Bot**:
    * Nhấn **Reset Token** → Sao chép mã Token lưu vào máy.
    * Kéo xuống mục **Privileged Gateway Intents** → Bật **Message Content Intent** (Bắt buộc để bot đọc được tin nhắn).
@@ -102,13 +101,10 @@ openclaw config patch --file config/qoder-replaces-pplx.patch.json5
 openclaw config patch --file config/discord.patch.json5
 openclaw config patch --file config/heartbeat-off.patch.json5
 
-# 7. Tạo 4 agent trước khi bind Discord account vào chúng
+# 7. Tạo 3 agent trước khi bind Discord account vào chúng
 openclaw agents add deepseek --non-interactive \
   --workspace "$HOME/.openclaw/workspaces/deepseek" \
   --model deepseek/deepseek-chat
-openclaw agents add gemini --non-interactive \
-  --workspace "$HOME/.openclaw/workspaces/gemini" \
-  --model google/gemini-2.5-flash
 openclaw agents add qoder --non-interactive \
   --workspace "$HOME/.openclaw/workspaces/qoder" \
   --model qoder-cli/auto
@@ -126,13 +122,11 @@ Lưu các token bot đã lấy ở Bước 1 vào các file tạm rồi chạy s
 ```bash
 # Lưu token vào file tạm (thay YOUR_TOKEN bằng token thật)
 echo "YOUR_DISCORD_TOKEN_XU" > ~/discord-xu.token
-echo "YOUR_DISCORD_TOKEN_CHUA" > ~/discord-chua.token
 echo "YOUR_DISCORD_TOKEN_THOI" > ~/discord-thoi.token
 echo "YOUR_DISCORD_TOKEN_VE_THANG" > ~/discord-ve-thang.token
 
 # Gắn bot vào OpenClaw
 scripts/add-bot.sh deepseek xu-bot       ~/discord-xu.token
-scripts/add-bot.sh gemini   chua-bot     ~/discord-chua.token
 scripts/add-bot.sh qoder    thoi-bot     ~/discord-thoi.token
 scripts/add-bot.sh codex    ve-thang-bot ~/discord-ve-thang.token
 
@@ -174,7 +168,6 @@ openclaw daemon restart
 
 Vào Discord server của bạn và tag tên bot để bắt đầu:
 * `@Xu giá Bitcoin hôm nay thế nào?`
-* `@Chùa tóm tắt bài viết này giúp tôi: [link hoặc văn bản dài]`
 * `@Thợ review đoạn code này xem có lỗi bảo mật nào không:`
 * `@Vé Tháng lên kế hoạch phát triển dự án này trong 3 tháng:`
 
@@ -186,7 +179,7 @@ Vào Discord server của bạn và tag tên bot để bắt đầu:
 config/*.json5            Cấu hình patch cho OpenClaw (backends, discord, heartbeat)
 personas/                 Tính cách (IDENTITY), phong cách trả lời (SOUL) & luật phòng
 personas/ROOM-RULES.md    Quy tắc chung mọi bot đều tuân theo
-personas/ROSTER.md        Bảng danh sách và Discord ID của 4 bot
+personas/ROSTER.md        Bảng danh sách và Discord ID của các bot
 scripts/add-bot.sh        Gắn bot Discord vào agent OpenClaw
 scripts/apply-personas.sh Đẩy persona vào gateway
 scripts/qoder-cli.sh      Wrapper nạp token trước khi gọi Qoder CLI
@@ -194,7 +187,6 @@ scripts/render-cli-backends.sh Tự động dò tìm đường dẫn binary trê
 docs/runbook.md           Hướng dẫn vận hành production trên VPS
 docs/discord-setup.md     Chi tiết kiến trúc Multi-bot Discord
 docs/vps-setup.md         Hướng dẫn chuyển từ máy local lên VPS
-docs/upgrade-plan-agent-stack.md Kế hoạch nâng cấp Full-Stack AI Agent (Exa, QMD, Crawl4AI, ByteRover, Browser Use)
 ```
 
 ---

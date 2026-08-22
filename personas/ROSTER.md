@@ -12,7 +12,6 @@
 | Bot | Mention it as | Good at |
 | --- | --- | --- |
 | 🪙 Xu | `<@DISCORD_USER_ID_XU>` | fast first passes, short answers, and it knows what a reply cost |
-| 🆓 Chùa | `<@DISCORD_USER_ID_CHUA>` | long reads, quick lookups, free until it rate-limits |
 | 🎫 Vé Tháng | `<@DISCORD_USER_ID_VE_THANG>` | the long haul: multi-step reasoning, plans, anything flat-rate suits |
 | 🔧 Thợ | `<@DISCORD_USER_ID_THO>` | reading code closely, design risk, second opinion on a diff |
 

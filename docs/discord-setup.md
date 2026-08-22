@@ -1,7 +1,7 @@
 # One Discord room, several model bots
 
-The target: a private server where `🪙 Xu` (DeepSeek), `🆓 Chùa` (Gemini),
-`🔧 Thợ` (Qoder), and `🎫 Vé Tháng` (Codex) all sit in the same workspace.
+The target: a private server where `🪙 Xu` (DeepSeek), `🔧 Thợ` (Qoder), and
+`🎫 Vé Tháng` (Codex) all sit in the same workspace.
 Tagging one of them assigns the work to that role. Review does not rely on
 Discord bots tagging each other; that path was tested and failed. Cross-review
 happens through OpenClaw agent-to-agent consults or the review script.
@@ -23,20 +23,19 @@ All of these are already written to `~/.openclaw/openclaw.json`.
 This document used to say tool denial "is the boundary that actually holds, and
 it cannot fail open". That is wrong, and the gateway log shows why:
 
-```
-22:54:21  tool policy removed 6 tool(s) via agents.claude.tools.deny:
-          apply_patch, cron, edit, exec, process, write
-22:54:23  cli exec: provider=claude-cli model=claude-sonnet-5
+```text
+tool policy removed 6 tool(s) via agents.<cli-agent>.tools.deny:
+  apply_patch, cron, edit, exec, process, write
+cli exec: provider=<cli-backend> model=<cli-model>
 ```
 
 OpenClaw removes the six tools from its own surface, and two seconds later hands
 the turn to a CLI backend running in a terminal with its own command surface.
 The deny list never names that inner tool surface and cannot reach it.
 
-The quoted line above is from a legacy Claude experiment, not the current demo
-roster. The lesson still applies to the current CLI-backed specialists
-(`qoder-cli` for Thợ and `codex-cli` for Vé Tháng): assume any CLI-backed agent
-can do what the logged-in Linux user can do.
+The lesson applies to the current CLI-backed specialists (`qoder-cli` for Thợ
+and `codex-cli` for Vé Tháng): assume any CLI-backed agent can do what the
+logged-in Linux user can do.
 
 So the deny list is real for agents on an API backend and cosmetic for agents on
 a CLI backend. Same family as the sandbox note above: a control that reports
@@ -77,7 +76,7 @@ Repeat for each bot, at <https://discord.com/developers/applications>:
    under Bot Permissions tick at least View Channels, Send Messages, Read
    Message History → open the generated URL → invite into the private server.
 
-Four core bots means four applications and four tokens. One shared private
+Three core bots means three applications and three tokens. One shared private
 server is enough.
 
 ## What runs after the tokens exist
@@ -89,9 +88,6 @@ chat window, then:
 openclaw agents add deepseek --non-interactive \
   --workspace "$HOME/.openclaw/workspaces/deepseek" \
   --model deepseek/deepseek-chat
-openclaw agents add gemini --non-interactive \
-  --workspace "$HOME/.openclaw/workspaces/gemini" \
-  --model google/gemini-2.5-flash
 openclaw agents add qoder --non-interactive \
   --workspace "$HOME/.openclaw/workspaces/qoder" \
   --model qoder-cli/auto
@@ -100,7 +96,6 @@ openclaw agents add codex --non-interactive \
   --model codex-cli/gpt-5.4
 
 scripts/add-bot.sh deepseek xu-bot       ~/discord-xu.token
-scripts/add-bot.sh gemini   chua-bot     ~/discord-chua.token
 scripts/add-bot.sh qoder    thoi-bot     ~/discord-thoi.token
 scripts/add-bot.sh codex    ve-thang-bot ~/discord-ve-thang.token
 openclaw agents list --bindings
@@ -116,7 +111,7 @@ with "Discord requires token". OpenClaw then stores it in plain text in
 
 Check `agents list --bindings` rather than assuming: a Discord account with no
 binding does not fail, it quietly falls through to the default agent. Confirm
-that all four accounts (`xu-bot`, `chua-bot`, `thoi-bot`, `ve-thang-bot`) route
+that all three accounts (`xu-bot`, `thoi-bot`, `ve-thang-bot`) route
 to their intended agents.
 
 ## Mention ids are still useful
@@ -136,8 +131,7 @@ public project history.
 Keep that table honest: an id that outlives the bot it was labelled with sends
 every agent's work to the wrong model, and nothing errors.
 
-Two more ways that table and the persona files go wrong, both found on 17/8 while
-naming a four-model room, both silent:
+Two more ways that table and the persona files can go wrong, both silent:
 
 **A roster that omits a member is read as a menu, not as an incomplete list.**
 One agent had no Discord app yet, so it was left out of the table. Asked its own
@@ -167,11 +161,11 @@ and logs nothing.
 
 ## Current state
 
-- Agents in the room: `main`, `deepseek`, `gemini`, `qoder`, `codex`. The four
+- Agents in the room: `main`, `deepseek`, `qoder`, `codex`. The three
   model agents have Discord bots; `main` catches unbound traffic.
 - Personas applied to the bot agents (`apply-personas.sh`).
 - Access to the room is one Discord user id on the guild allowlist. That, not
   the tool denies, is what stops anyone else from reaching these bots at all.
 - **Do not set `plugins.allow`.** It reads like the fix for the auto-load
   warning and it is an absolute allowlist: it took enabled plugins from 32/33 to
-  2/68 and broke `anthropic` hours later, somewhere unrelated.
+  most auto-loaded providers and can break unrelated model routes later.

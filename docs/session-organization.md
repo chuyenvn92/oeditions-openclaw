@@ -38,8 +38,8 @@ project channel.
   research summaries, KB recall/save, and tight handoffs.
 - Ve Thang is the deep-work partner: planning, code reasoning, long reviews,
   and final synthesis when a task needs more than a quick pass.
-- Chua and Tho should stay quiet unless the human tags them directly. They are
-  specialists, not ambient participants.
+- Tho should stay quiet unless the human tags it directly. It is a specialist,
+  not an ambient participant.
 
 ## Privacy pattern
 

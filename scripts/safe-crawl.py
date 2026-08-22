@@ -3,16 +3,22 @@
 
     scripts/safe-crawl.py <url>
 
-Resolves the URL's hostname and rejects it before Crawl4AI/Playwright ever
-opens a connection, so a redirect or a DNS answer pointing at the cloud
-metadata endpoint or an internal address never reaches the browser.
+Resolves the URL's hostname and follows redirects itself first, rejecting the
+request before Crawl4AI/Playwright ever opens a connection, so a redirect or a
+DNS answer pointing at the cloud metadata endpoint or an internal address is
+caught up front. The browser crawler is then pointed at the already-validated
+final URL rather than the original one, so it does not silently re-follow a
+different, unchecked redirect chain of its own.
 
-This is the app-level half of the SSRF defense. It only covers requests made
-through this script. It does not, and cannot, stop a CLI-backed agent (Thợ,
-Vé Tháng) from reaching the same addresses directly with its own shell — that
-boundary is the iptables rule on the host (see docs/vps-setup.md), which
-applies to every process running as the `openclaw` user regardless of which
-tool it used.
+This is still only app-level, best-effort defense: Crawl4AI/Playwright
+performs its own DNS resolution when it fetches that URL, so a DNS answer that
+changes between the check here and the browser's own request (DNS rebinding)
+is not caught by this script. It only covers requests made through this
+script, and it does not, and cannot, stop a CLI-backed agent (Thợ, Vé Tháng)
+from reaching the same addresses directly with its own shell — that boundary
+is the iptables rule on the host (see docs/vps-setup.md), which applies to
+every process running as the `openclaw` user regardless of which tool it
+used.
 """
 import ipaddress
 import socket
@@ -62,7 +68,7 @@ class GuardedRedirectHandler(urllib.request.HTTPRedirectHandler):
         return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
-def check_redirect_chain(url: str) -> None:
+def check_redirect_chain(url: str) -> str:
     opener = urllib.request.build_opener(GuardedRedirectHandler)
     req = urllib.request.Request(
         url,
@@ -72,11 +78,13 @@ def check_redirect_chain(url: str) -> None:
     try:
         with opener.open(req, timeout=10) as resp:
             check_url(resp.geturl())
+            return resp.geturl()
     except urllib.error.HTTPError as exc:
         # Some sites reject HEAD while still being safe to crawl. Redirects
         # are still processed before this point, so validate the final URL and
         # let the browser crawler handle the actual GET.
         check_url(exc.geturl())
+        return exc.geturl()
     except urllib.error.URLError as exc:
         raise ValueError(f"SSRF Blocked: redirect check failed: {exc}") from exc
 
@@ -89,7 +97,7 @@ def main() -> int:
     url = sys.argv[1]
     try:
         check_url(url)
-        check_redirect_chain(url)
+        url = check_redirect_chain(url)
     except ValueError as exc:
         print(str(exc), file=sys.stderr)
         return 1

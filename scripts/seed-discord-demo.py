@@ -16,13 +16,13 @@ import urllib.request
 from argparse import ArgumentParser
 
 
-CHANNELS = {
-    "general": "REDACTED_CHANNEL_ID",
-    "research-desk": "REDACTED_CHANNEL_ID",
-    "code-review": "REDACTED_CHANNEL_ID",
-    "openclaw-config": "REDACTED_CHANNEL_ID",
-    "video-maker": "REDACTED_CHANNEL_ID",
-    "demo-stage": "REDACTED_CHANNEL_ID",
+DEFAULT_CHANNELS = {
+    "general": "DISCORD_CHANNEL_GENERAL",
+    "research-desk": "DISCORD_CHANNEL_RESEARCH_DESK",
+    "code-review": "DISCORD_CHANNEL_CODE_REVIEW",
+    "openclaw-config": "DISCORD_CHANNEL_OPENCLAW_CONFIG",
+    "video-maker": "DISCORD_CHANNEL_VIDEO_MAKER",
+    "demo-stage": "DISCORD_CHANNEL_DEMO_STAGE",
 }
 
 
@@ -38,12 +38,6 @@ MESSAGES = [
         "general",
         "[demo seed] Nếu ai hỏi OpenClaw khác chatbot ở đâu: chatbot trả lời trong ô chat; "
         "OpenClaw biến Discord thành cửa điều phối agent + tool + workspace.",
-    ),
-    (
-        "chua-bot",
-        "research-desk",
-        "[demo seed] Research note: so sánh OpenClaw với chatbot nên tránh nói tuyệt đối. "
-        "Chatbot hiện đại cũng có tool/memory; điểm khác nằm ở gateway tự host, routing, workspace và quyền.",
     ),
     (
         "xu-bot",
@@ -127,12 +121,32 @@ def load_accounts() -> dict:
     return config["channels"]["discord"]["accounts"]
 
 
-def send_message(accounts: dict, account_id: str, channel_name: str, content: str) -> tuple[bool, str]:
+def load_channels(path: str) -> dict[str, str]:
+    if path:
+        with open(os.path.expanduser(path), "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+        return {str(k): str(v) for k, v in data.items()}
+    return {
+        name: os.environ.get(env_name, "").strip()
+        for name, env_name in DEFAULT_CHANNELS.items()
+    }
+
+
+def send_message(
+    accounts: dict,
+    channels: dict[str, str],
+    account_id: str,
+    channel_name: str,
+    content: str,
+) -> tuple[bool, str]:
     token = accounts.get(account_id, {}).get("token")
     if not token:
         return False, f"missing token for {account_id}"
+    channel_id = channels.get(channel_name, "").strip()
+    if not channel_id:
+        return False, f"missing channel id for {channel_name}"
 
-    url = f"https://discord.com/api/v10/channels/{CHANNELS[channel_name]}/messages"
+    url = f"https://discord.com/api/v10/channels/{channel_id}/messages"
     payload = json.dumps(
         {"content": content, "allowed_mentions": {"parse": []}},
         ensure_ascii=False,
@@ -166,6 +180,11 @@ def parse_args() -> object:
         action="store_true",
         help="Print the planned messages without sending them.",
     )
+    parser.add_argument(
+        "--channels",
+        default="",
+        help="Optional JSON file mapping channel names to Discord channel ids.",
+    )
     return parser.parse_args()
 
 
@@ -177,9 +196,10 @@ def main() -> int:
         return 0
 
     accounts = load_accounts()
+    channels = load_channels(args.channels)
     sent = 0
     for index, (account_id, channel_name, content) in enumerate(MESSAGES, 1):
-        ok, result = send_message(accounts, account_id, channel_name, content)
+        ok, result = send_message(accounts, channels, account_id, channel_name, content)
         status = "OK" if ok else "FAIL"
         print(f"{index:02d} {status} {account_id} -> #{channel_name}: {result}")
         sent += int(ok)

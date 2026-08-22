@@ -3,8 +3,8 @@
 
     scripts/ask-agent <agent_name> "<prompt>"
 
-The live allowlist intentionally permits only Codex / Vé Tháng. Chùa and Thợ
-must be tagged directly by the human.
+The live allowlist intentionally permits only Codex / Vé Tháng. Thợ must be
+tagged directly by the human.
 """
 from __future__ import annotations
 
@@ -66,7 +66,7 @@ def main() -> int:
     if agent_id not in ALLOWED_AGENT_IDS:
         print(
             "Error: ask-agent is only allowlisted for codex / Vé Tháng. "
-            "Ask the human to tag Chùa or Thợ directly.",
+            "Ask the human to tag Thợ directly.",
             file=sys.stderr,
         )
         return 2
